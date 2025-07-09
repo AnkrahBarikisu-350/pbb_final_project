@@ -164,7 +164,7 @@ liver_smoke_df_2005 = pd.merge(
     liver_df[liver_df["year"] == 2005],
     smokers_df_2005,
     on=["country", "year", "country_code", "continent"],
-    how="left",
+    how="outer",
 )
 
 # --- Page 1: liver Cancer Death Rate Summary---
@@ -172,7 +172,7 @@ liver_smoke_df_2005 = pd.merge(
 #  Liver Cancer in Men
 
 # 1. Line plot: Trend over years for a few selected countries
-selected_countries = ["China", "United States", "Egypt", "Japan", "Brazil"]
+selected_countries = ["China", "United States", "Egypt", "Japan", "Ghana"]
 liver_men_trends = liver_df[liver_df["country"].isin(selected_countries)]
 fig_line = px.line(
     liver_men_trends,
@@ -186,17 +186,16 @@ fig_line = px.line(
 fig_line.update_layout(showlegend=False)
 
 
-# 2. Bar chart: Top 10 countries with highest male liver cancer deaths (latest year)
-latest_year = liver_df["year"].max()
-top10_men_latest = liver_df[liver_df["year"] == latest_year].nlargest(
+# 2. Bar chart: Top 10 countries with highest male liver cancer deaths (2005)
+selected_year = liver_df["year"].max()
+top10_men_selected = liver_df[liver_df["year"] == selected_year].nlargest(
     10, "male_death_rate"
 )
 fig_bar = px.bar(
-    top10_men_latest,
+    top10_men_selected,
     x="male_death_rate",
     y="country",
-    orientation="h",
-    title=f"Top 10 Countries with Highest Liver Cancer Deaths in Men ({latest_year})",
+    title=f"Top 10 Countries with Highest Liver Cancer Deaths in Men (2005)",
     labels={"male_death_rate": "Deaths per 100,000 Men", "country": "Country"},
     color="male_death_rate",
 )
@@ -205,32 +204,34 @@ fig_bar.update_layout(
 )
 
 
-# 3. Value box: Global average, peak, and minimum value in latest year
-latest_year_data = liver_df[liver_df["year"] == latest_year]
+# 3. Value box: Global average, peak, and minimum value in selected year
+liver_df_2005 = liver_df[liver_df["year"] == 2005]
 
-global_avg_male = latest_year_data["male_death_rate"].mean()
+global_avg_male = liver_df_2005["male_death_rate"].mean()
 global_avg_male = round(global_avg_male, 1)
-global_max_male = latest_year_data["male_death_rate"].max()
-global_max_country = latest_year_data.loc[
-    latest_year_data["male_death_rate"].idxmax(), "country"
+global_max_male = liver_df_2005["male_death_rate"].max()
+global_max_country = liver_df_2005.loc[
+    liver_df_2005["male_death_rate"].idxmax(), "country"
 ]
 
-global_min_male = latest_year_data["male_death_rate"].min()
-global_min_country = latest_year_data.loc[
-    latest_year_data["male_death_rate"].idxmin(), "country"
+global_min_male = liver_df_2005["male_death_rate"].min()
+global_min_country = liver_df_2005.loc[
+    liver_df_2005["male_death_rate"].idxmin(), "country"
 ]
 
 
 # 4. Text Summary
 summary = f"""
-Between 1990 and {latest_year}, liver cancer deaths in men have shown varying trends globally.
+Liver cancer deaths in men have shown varying trends globally.
 Countries like Mongolia and Gambia have consistently reported high rates, while developed nations such as the US and Japan have seen more stable trends.
-The global average in {latest_year} stands at {global_avg_male:.2f}, with {global_max_country} having the highest rate of {global_max_male:.2f} deaths per 100,000 men.
+The global average in 2005 stands at {global_avg_male:.2f}, with {global_max_country} having the highest rate of {global_max_male:.2f} deaths per 100,000 men.
 """
 
 # Line Chart Sammary
 summary_line = f"""
-The graph presents the trend in liver cancer death rates among men and women from 1990 to 2022 for four countries: Brazil, China, Japan, and Egypt. China made significant progress in reducing liver cancer deaths, while Egypt experienced increasing rates before stabilizing. Japan shows steady improvement, and Brazil maintained low and stable rates.
+The graph presents the trend in liver cancer death rates among men and women from 1990 to 2022 for four countries: Ghana, China, Japan, and Egypt. 
+China made significant progress in reducing liver cancer deaths, while Egypt experienced increasing rates before stabilizing. 
+Japan shows steady improvement, and Ghana maintained low and stable rates.
 """
 
 
@@ -250,112 +251,70 @@ fig_line_women = px.line(
 fig_line_women.update_layout(showlegend=False)
 
 
-# 2. Bar chart: Top 10 countries with highest female liver cancer deaths (latest year)
-top10_women_latest = liver_df[liver_df["year"] == latest_year].nlargest(
+# 2. Bar chart: Top 10 countries with highest female liver cancer deaths (2005)
+top10_women_selected = liver_df[liver_df["year"] == selected_year].nlargest(
     10, "female_death_rate"
 )
 fig_bar_women = px.bar(
-    top10_women_latest,
+    top10_women_selected,
     x="female_death_rate",
     y="country",
-    orientation="h",
-    title=f"Top 10 Countries with Highest Liver Cancer Deaths in Women ({latest_year})",
+    title=f"Top 10 Countries with Highest Liver Cancer Deaths in Women ({selected_year})",
+    color="female_death_rate",
+    color_continuous_scale="Reds",
     labels={"female_death_rate": "Deaths per 100,000 Women", "country": "Country"},
 )
 fig_bar_women.update_layout(yaxis={"categoryorder": "total ascending"})
 
 
-# 3. Value box: Global average, peak, and minimum value in latest year
-latest_year_data = liver_df[liver_df["year"] == latest_year]
-
-global_avg_female = latest_year_data["female_death_rate"].mean()
+# 3. Value box: Global average, peak, and minimum value in 2005
+global_avg_female = liver_df_2005["female_death_rate"].mean()
 global_avg_female = round(global_avg_female, 1)
-global_max_female = latest_year_data["female_death_rate"].max()
-global_max_female_country = latest_year_data.loc[
-    latest_year_data["female_death_rate"].idxmax(), "country"
+global_max_female = liver_df_2005["female_death_rate"].max()
+global_max_female_country = liver_df_2005.loc[
+    liver_df_2005["female_death_rate"].idxmax(), "country"
 ]
 
-global_min_female = latest_year_data["female_death_rate"].min()
-global_min_female_country = latest_year_data.loc[
-    latest_year_data["female_death_rate"].idxmin(), "country"
+global_min_female = liver_df_2005["female_death_rate"].min()
+global_min_female_country = liver_df_2005.loc[
+    liver_df_2005["female_death_rate"].idxmin(), "country"
 ]
 
 
 # 4. Text Summary
 summary_female = f"""
-From 1990 to {latest_year}, liver cancer death rates in women have trended differently across regions.
+Liver cancer death rates in women have trended differently across regions.
 While some countries such as Mongolia report extreme high rates, other countries show gradual improvements.
-The global average in {latest_year} is {global_avg_female:.2f}, with {global_max_female_country} experiencing the highest rate at {global_max_female:.2f} deaths per 100,000 women.
+The global average in {selected_year} is {global_avg_female:.2f}, with {global_max_female_country} experiencing the highest rate at {global_max_female:.2f} deaths per 100,000 women.
 """
 
 
-# --- Gender Comparison ---
+# --- Regional Summary ---
 
-# 1. Scatter Plot: Male vs Female liver cancer death rates (latest year)
-fig_scatter = px.scatter(
-    liver_df[liver_df["year"] == latest_year],
-    x="female_death_rate",
-    y="male_death_rate",
-    hover_name="country",
-    title=f"Liver Cancer Death Rate: Male vs Female by Country ({latest_year})",
-    labels={
-        "female_death_rate": "Female Death Rate (per 100,000)",
-        "male_death_rate": "Male Death Rate (per 100,000)",
-    },
-)
-fig_scatter.update_traces(
-    marker=dict(size=10, opacity=0.7, line=dict(width=1, color="DarkSlateGrey"))
-)
-fig_scatter.add_shape(
-    type="line",
-    x0=0,
-    y0=0,
-    x1=max(liver_df["female_death_rate"]),
-    y1=max(liver_df["male_death_rate"]),
-    line=dict(dash="dash", color="gray"),
-)
+# Boxplot Summary
+summary_boxplot_male = f"""
+Mongolia (Asia) is an extreme outlier in terms of male liver cancer death.
 
+Oceania and Africa show high variability and generally higher male death rates.
 
-# 2. Table: Country-wise male, female, and ratio values
-comparison_df = liver_df[liver_df["year"] == latest_year][
-    ["country", "male_death_rate", "female_death_rate", "male_female_ratio"]
-]
-comparison_df = comparison_df.sort_values(by="male_female_ratio", ascending=False)
+Europe and America have more consistent and lower death rates.
 
-
-# 3. Value Boxes: Highest ratio and lowest ratio
-highest_ratio = comparison_df["male_female_ratio"].max()
-highest_country = comparison_df.loc[
-    comparison_df["male_female_ratio"].idxmax(), "country"
-]
-lowest_ratio = comparison_df["male_female_ratio"].min()
-lowest_country = comparison_df.loc[
-    comparison_df["male_female_ratio"].idxmin(), "country"
-]
-
-
-# 4. Text Summary
-summary_comparison = f"""
-This analysis highlights gender disparities in liver cancer death rates as of {latest_year}.
-Some countries show significantly higher mortality in men than women, reflecting behavioral, biological, or healthcare access differences.
-{highest_country} has the highest male-to-female ratio at {highest_ratio:.2f}, while {lowest_country} shows the smallest gap with a ratio of {lowest_ratio:.2f}.
-These insights can guide gender-sensitive public health interventions.
+This visualization helps highlight both intercontinental disparities and intra-regional differences that might warrant further investigation or targeted interventions.
 """
+
+# Boxplot Summary
+summary_boxplot_female = f"""
+Asia again has extreme outliers (e.g., Mongolia) with very high death rates.
+
+Oceania and Africa show elevated and varied female death rates.
+
+Europe and America exhibit relatively lower and more consistent liver cancer death outcomes for women.
+
+This visualization underscores regional disparities and reveals a similar pattern to male death rates—though female mortality is generally lower, the geographic inequality persists.
+"""
+
 
 ## ---Page 2: Global Smoking Prevalence Summary---
-
-
-# Calculate global averages
-avg_male = smokers_df_2005["male_smokers(%)"].mean()
-avg_female = smokers_df_2005["female_smokers(%)"].mean()
-
-
-# Top 10 male and female smoking countries
-top_male = smokers_df_2005.sort_values(by="male_smokers(%)", ascending=False).head(10)
-top_female = smokers_df_2005.sort_values(by="female_smokers(%)", ascending=False).head(
-    10
-)
-
 
 # Create choropleth map for male smokers
 fig_map_male_smoker = px.choropleth(
@@ -570,7 +529,7 @@ fig_male_corr.for_each_xaxis(lambda axis: axis.update(title=None))
 # Set a single global x-axis label
 fig_male_corr.update_layout(
     xaxis_title="Male Smokers (%)",
-    showlegend=True,
+    showlegend=False,
     margin=dict(t=60, b=40, l=40, r=40),
     font=dict(size=12),
     title_font=dict(size=16),
@@ -611,7 +570,7 @@ fig_female_corr.for_each_xaxis(lambda axis: axis.update(title=None))
 # Set a single global x-axis label
 fig_female_corr.update_layout(
     xaxis_title="Female Smokers (%)",
-    showlegend=True,
+    showlegend=False,
     margin=dict(t=60, b=40, l=40, r=40),
     font=dict(size=12),
     title_font=dict(size=16),
@@ -654,7 +613,8 @@ fig_female_grouped = px.bar(
 
 # Enforce the order
 fig_female_grouped.update_layout(
-    xaxis=dict(categoryorder="array", categoryarray=top10_female["country"].tolist())
+    xaxis=dict(categoryorder="array", categoryarray=top10_female["country"].tolist()),
+    showlegend=False,
 )
 
 # Grouped bar chart of top 10 Countries for male Liver Cancer Death vs. Smoking Rate (2005)
@@ -690,7 +650,8 @@ fig_male_grouped = px.bar(
 
 # Enforce the order
 fig_male_grouped.update_layout(
-    xaxis=dict(categoryorder="array", categoryarray=top10_male["country"].tolist())
+    xaxis=dict(categoryorder="array", categoryarray=top10_male["country"].tolist()),
+    showlegend=False,
 )
 
 
@@ -704,11 +665,11 @@ fig_male_grouped.update_layout(
 
 This project presents an interactive dashboard analyzing global liver cancer mortality rates and smoking prevalence patterns using Gapminder data. The analysis focuses on gender-specific trends, cross-country comparisons, and continent-level summaries to uncover public health insights that can inform policy and awareness campaigns.
 
-The primary objective is to explore the relationship between liver cancer death rates and smoking behaviors across different countries, with a focus on how these patterns vary between men and women. The dashboard integrates multiple visualizations, including line charts, bar graphs, bubble plots, and choropleth maps, to reveal trends, disparities, and potential correlations in the data.
+The primary objective is to explore the relationship between liver cancer death rates and smoking behaviors across different countries, with a focus on how these patterns vary between men and women(2005). The dashboard integrates multiple visualizations, including line charts, bar graphs, bubble plots, choropleth maps, etc to reveal trends, disparities, and potential correlations in the data.
 
-The dataset includes liver cancer deaths per 100,000 people for men and women from 1990 to 2019, as well as smoking rates for men and women (aged 15 and above) in the year 2005. These metrics are complemented with region-based aggregations to identify continents with the highest and lowest burden.
+The dataset used includes liver cancer deaths per 100,000 people for men and women(2005), as well as smoking rates for men and women (aged 15 and above) in the year 2005. These metrics are complemented with region-based aggregations to identify continents with the highest and lowest burden.
 
-By combining epidemiological and behavioral data, the dashboard offers a rich platform for exploring the intersections of lifestyle, geography, and public health outcomes related to liver cancer.
+By combining epidemiological and behavioral data, the dashboard offers a rich platform for exploring the intersections of lifestyle, geography, and public health outcomes related to liver cancer deaths.
 
 
 # Liver Cancer Death Rate
@@ -788,30 +749,59 @@ fig_bar
 fig_bar_women
 ```
 
-### Male Vs Female
-
+### Regional Male Rate
 ```{python}
-fig_scatter
+continent_fig = px.box(
+    liver_smoke_df_2005,
+    x="continent",
+    y="male_death_rate",
+    color="continent",
+    title="Distribution of Male Death Rate by Continent",
+    points="all",  # This shows all data points
+    hover_data=["country"],  # This adds country names to hover info
+    color_discrete_sequence=px.colors.sequential.Turbo,  # Built-in Blues palette
+).update_layout(
+    showlegend=False, xaxis_title="Continent", yaxis_title="male_death_rate"
+)
+
+continent_fig
 ```
 
-### Comparison Table 
+### Regional Female Rate
 
 ```{python}
-itables.show(comparison_df.head(10))
+continent_fig_f = px.box(
+    liver_smoke_df_2005,
+    x="continent",
+    y="female_death_rate",
+    color="continent",
+    title="Distribution of Female Death Rate by Continent",
+    points="all",  # This shows all data points
+    hover_data=["country"],  # This adds country names to hover info
+    color_discrete_sequence=["#1f77b4", "#ff7f0e", "#2ca02c", "#eb4034", "#34ebd0"], 
+).update_layout(
+    showlegend=False, xaxis_title="Continent", yaxis_title="male_death_rate"
+)
+
+continent_fig_f
 ```
 
-### Interpretation of Charts
+### Chart Summary
 
 
 ```{python}
 
-print("Summary Line Chart):" + summary_line)
+print("Summary Line Chart:" + summary_line)
 
-print("Trend Summary(Male):" + summary)
+print("Bar Summary(Male):" + summary)
 
-print("Trend Summary (Female):" + summary_female)
+print("Bar Summary (Female):" + summary_female)
 
-print("Gender Comparison Summary:" + summary_comparison)
+print("Box Summary (Male):" + summary_boxplot_male)
+
+print("Box Summary (Female):" + summary_boxplot_female)
+
+
 ```
 
 
@@ -822,89 +812,141 @@ print("Gender Comparison Summary:" + summary_comparison)
 ### 
 
 ```{python}
-fig_map_male_smoker
+# Create regional summary
+reg_sum_male = (
+    smokers_df_2005.groupby("continent")
+    .apply(
+        lambda g: pd.Series(
+            {
+                "Average smoking %(Male )": g["male_smokers(%)"].mean(),
+                "Lowest smoking %(Male)": g["male_smokers(%)"].min(),
+                "Country ": g.loc[g["male_smokers(%)"].idxmin(), "country"],
+                "Highest smoking %(Male)": g["male_smokers(%)"].max(),
+                "Country": g.loc[
+                    g["male_smokers(%)"].idxmax(), "country"
+                ],
+            }
+        )
+    )
+    .round(2)
+)
+
+itables.show(
+    reg_sum_male,
+    caption="Regional Summary Statistics for Male Smoking Rate (2005)",
+    buttons=["csvHtml5"]
+)
 ```
 
 ###
+
+```{python}
+# Create regional summary
+reg_sum_female = (
+    smokers_df_2005.groupby("continent")
+    .apply(
+        lambda g: pd.Series(
+            {
+                "Average smoking %(Female )": g["female_smokers(%)"].mean(),
+                "Lowest smoking %(Female)": g["female_smokers(%)"].min(),
+                "Country ": g.loc[g["female_smokers(%)"].idxmin(), "country"],
+                "Highest smoking %(Female)": g["female_smokers(%)"].max(),
+                "Country": g.loc[
+                    g["female_smokers(%)"].idxmax(), "country"
+                ],
+            }
+        )
+    )
+    .reset_index()  # convert 'continent' from index to a column
+    .round(2)
+)
+
+itables.show(
+    reg_sum_female,
+    caption="Regional Summary Statistics for Female Smoking Rate (2005)",
+    buttons=["csvHtml5"]
+)
+
+```
+
+
+## Row 2{height="60%"}
+
+
+### {.tabset}
+
+#### Highest Male Smoking Continent
+
+```{python}
+fig_top_continent
+```
+
+#### Highest Female smoking Continent 
+
+```{python}
+fig_top_female_continent
+```
+
+### {.tabset}
+
+#### Global Map Male
+```{python}
+fig_map_male_smoker
+```
+
+#### Global Map female
 
 ```{python}
 fig_map_female_smoker
 ```
 
 
-## Row 2{height="60%"}
 
-### {.tabset}
+### Chart Insight
 
-#### Average Smoking Rate
-```{python}
-fig_bubble
-```
+**Interpretation of Tables and Charts:**
 
-#### Chart Insight
-The bubble chart visualizes the average smoking rates among men and women across continents in 2005. Each bubble represents a continent, with its size proportional to the number of countries represented in the dataset.
+**Regional Summary Statistics for Male Smoking Rate (2005)**
 
-Key Insights:
+- Asia had the highest average male smoking rate at 42.02%, with Indonesia reaching 65.9%.
 
-Europe has the highest average female smoking rate (~27%) and one of the highest male smoking rates (~41%), indicating widespread smoking habits among both genders.
+- Europe followed closely with 40.52% on average and Russia topping at 70.1%, the highest male smoking rate recorded.
 
-Asia shows the highest average male smoking rate (~43%) but significantly lower female smoking rates (~8%), suggesting a large gender gap in smoking behavior.
+- Oceania showed a similarly high average of 41.17%, with Tonga at 61.8%.
 
-Oceania closely follows Europe in male smoking prevalence (~41%) and has a moderate female smoking rate (~20%), suggesting more balanced smoking patterns across genders.
+- America had a moderate average of 30.04%, led by Cuba at 43.4%.
 
-America presents a moderate pattern with male smoking around 30% and female smoking around 17%, indicating a relatively smaller gender gap.
-
-Africa has the lowest female smoking rate (~4%) and a relatively lower male rate (~23%), suggesting smoking is less prevalent, especially among women.
-
-The small bubble labeled "not found" likely represents data points with undefined continent classification. It has low values for both male and female smoking.
+- Africa recorded the lowest average at 23.05%, with Ethiopia as the lowest country at 7.6%, but still had some high outliers like Tunisia (51%).
 
 
-### {.tabset}
+**Regional Summary Statistics for Female Smoking Rate (2005)**
 
-#### Female Smoking Continent
+- Europe had the highest average female smoking rate (26.69%), with Serbia reaching a peak of 42.3%.
 
-```{python}
-fig_top_female_continent
-```
+- Oceania followed with an average of 20.42%, and Nauru reported the highest rate at 52.4%, the highest individual country rate overall.
 
-#### Male smoking Continent 
+- America showed a moderate average (16.75%), with Chile at 33.6%.
 
-```{python}
-fig_top_continent
-```
+- Asia had a relatively low average of 7.25%, with Nepal reaching the regional peak of 26.4%.
 
+- Africa had the lowest average female smoking rate (3.9%), and Algeria recorded the lowest value worldwide at just 0.3%.
 
-### {.tabset}
-
-#### Male Vs Female
-
-```{python}
-fig_grouped_bar
-```
-
-#### Chart Insight
-
-**Interpretation of the Charts:**
 
 **Male vs Female Smoking Rates in Asia (2005)**
 
-This bubble chart visualizes male and female smoking rates in various Asian countries in the year 2005.
+The bubble chart visualizes male and female smoking rates in various countries of the highest male smoking continent in 2005.
 
 Bubble Size: Gender gap in smoking rates (Male % – Female %)
 
 The chart illustrates a significant gender disparity in smoking across most Asian countries in 2005. The public health burden of smoking in Asia is heavily male-dominated, pointing to the need for targeted anti-smoking policies for men, while remaining alert to rising female trends in certain countries.
 
+
 **Male vs Female Smoking Rates in Europe (2005)**
 
-The bubble chart visualizes the smoking behavior of European countries in 2005, comparing male and female smoking rates on the x and y axes respectively. Each bubble represents a country, and the bubble size corresponds to the gender smoking gap (i.e., the absolute difference between male and female smoking rates).
+The bubble chart visualizes the smoking behavior of countries in the highest female smoking continent in 2005, comparing male and female smoking rates on the x and y axes respectively. Each bubble represents a country, and the bubble size corresponds to the gender smoking gap (i.e., the absolute difference between male and female smoking rates).
 
 Europe in 2005 showed relatively high smoking rates among both men and women, but with varying degrees of gender disparity. Countries in Western and Northern Europe (e.g., Denmark, Switzerland) appear to have more gender-equal smoking behaviors, while some Eastern and Southeastern European countries (e.g., Albania, Bosnia) reflect traditional gender norms where smoking is predominantly a male behavior.
 
-**Average Smoking Rates by Continent and Gender (2005)**
-
-The grouped bar chart compares average smoking rates between men and women across different continents in the year 2005. Each pair of bars represents male and female smoking prevalence for a given continent.
-
-The chart clearly reveals that gender plays a major role in smoking behaviors across continents. Asia shows the widest gender disparity, while Europe shows the highest overall prevalence with more gender parity. These patterns offer important cues for targeted tobacco control policies, where interventions may need to be gender-sensitive and region-specific.
 
 
 # Liver Cancer Vs Smoking
@@ -932,14 +974,14 @@ fig_female_corr
 fig_male_grouped
 ```
 
-### Female
+
+### {.tabset}
+
+#### Female
 
 ```{python}
 fig_female_grouped
 ```
-
-
-### {.tabset}
 
 #### Chart Insight
 
@@ -947,7 +989,7 @@ fig_female_grouped
 
 1. Countries like Mongolia and Egypt show very high liver cancer death rates but moderate or low smoking rates.
 
-2. The gender gap in smoking is significant—in many of these countries, male smoking rates are far higher than female, which may partially explain why male liver cancer deaths are higher.
+2. The gender gap in smoking is significant in many of these countries, male smoking rates are far higher than female, which may partially explain why male liver cancer deaths are higher.
 
 **Female Chart Insights**
 
@@ -955,7 +997,8 @@ fig_female_grouped
 
 2. There’s generally a weaker correlation between smoking and liver cancer in women compared to men which may be due to lower female smoking prevalence in many countries.
 
-#### General Conlusion
+
+# Conlusion
 
 This study explored the relationship between liver cancer death rates and smoking prevalence across countries using Gapminder data from 2005 and 1990–2019. It focused on gender-specific patterns, regional differences, and the strength of association between smoking and liver cancer.
 
@@ -963,11 +1006,11 @@ This study explored the relationship between liver cancer death rates and smokin
 
 - Countries like Mongolia, Egypt, and China consistently exhibit high liver cancer death rates, especially among men.
 
-- Developed countries show more stable or declining trends, likely due to improved healthcare and preventive measures.
+- Developed countries showed more stable or declining trends, likely due to improved healthcare and preventive measures.
 
 2. Male Liver Cancer Death Rates Are Significantly Higher Than Female Rates
 
-- A clear gender gap exists, with most countries reporting higher mortality in men,linked to behavior (e.g., smoking, alcohol), biology, and occupational exposures.
+- A clear gender gap exists, with most countries reporting higher mortality in men, which may be linked to behavior (e.g., smoking, alcohol), biology, and occupational exposures.
 
 3. Smoking Patterns Are Gender and Region-Specific
 
@@ -979,7 +1022,7 @@ This study explored the relationship between liver cancer death rates and smokin
 
 4. Smoking Alone Does Not Fully Explain Liver Cancer Trends
 
-- While countries like Russia, Indonesia, and Vietnam exhibit alignment between smoking and liver cancer rates in men, others (e.g., Egypt and Mongolia) show high death rates but low smoking prevalence—indicating the influence of other factors like:
+- While countries like Russia, Indonesia, and Vietnam exhibit alignment between smoking and liver cancer rates in men, others (e.g., Egypt and Mongolia) show high death rates but low smoking prevalence. This may indicate the influence of other factors like:
 
 - Hepatitis B/C infections
 
@@ -989,7 +1032,7 @@ This study explored the relationship between liver cancer death rates and smokin
 
 - Limited access to early diagnosis and treatment
 
-
+**It can therefore be concluded that, there is a weak correlation between smoking and liver cancer death.** 
 
 # Data
 
@@ -1002,8 +1045,8 @@ This study explored the relationship between liver cancer death rates and smokin
 ```{python}
 # Display full dataset with itables
 itables.show(
-    liver_smoke_df_2005.head(50),
-    caption="Gapminder Dataset (2007)",
+    liver_smoke_df_2005,
+    caption="Merged From Gapminder Dataset (2005)",
     buttons=["csvHtml5"],
 )
 ```
@@ -1014,20 +1057,33 @@ This analysis uses publicly available datasets from **[Gapminder](https://www.ga
 
 **Key Indicators:**
 
-- **Liver Cancer Death Rates**  
-  - Annual deaths per 100,000 people  
-  - Separate data for **men** and **women**  
-  - Covers the period **1955 - 2019**
+- **Liver Cancer Death Rate**
 
-- **Smoking Prevalence (2000 - 2005)**  
-  - Percetage of adults (15+) who smoke  
+  - liver cancer, deaths per 100 000 women: 
+  Number of death due to liver cancer in 100,000 female residents during the certain year. 
+  This rate  is calculated as if each country has the same age composition as the world population.
+
+  - liver cancer, deaths per 100 000 men: Number of death due to liver cancer in 100,000 male residents during the certain year. 
+  This rate  is calculated as if each country has the same age composition as the world population.
+
   - Separate data for **men** and **women**
 
-**Coverage:**
+  - Covers the period **1955 - 2019**
 
-- Over 150 countries
-- Grouped by continent
-- Includes standardized ISO3 country codes for geospatial visualizations
+- **Smoking Prevalence**
 
-These datasets were cleaned, merged, and transformed to enable gender-based, temporal, and cross-continental comparisons.
+  - Smoking men (% of men over age 15): 
+  Percentage of men (over age 15) that smoke. Note: only 2005 tobacco data is provided by WHOSIS. In order to compare with 2002 lung cancer data, 2005 tobbaco data was copied into 2002, based on the assumption that people's habit of smoking won't significantly change during 3 years.
+
+  - Smoking women (% of women over age 15): 
+  Percentage of women (over age 15) that smoke. Note: only 2005 tobacco data is provided by WHOSIS. In order to compare with 2002 lung cancer data, 2005 tobbaco data was copied into 2002, based on the assumption that people's habit of smoking won't significantly change during 3 years.
+
+  - Separate data for **men** and **women**
+
+  - Covers the period **2000 - 2005**
+
+
+These datasets were cleaned, merged, and transformed to enable gender-based, temporal, and cross-continental comparisons using python library like pandas, plotyl express, itables etc.
+
+
 
