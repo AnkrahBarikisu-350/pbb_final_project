@@ -1142,8 +1142,7 @@ This analysis uses publicly available datasets from **[Gapminder](https://www.ga
   - Covers the period **2000 - 2005**
 
 
-These datasets were cleaned, merged, and transformed to enable gender-based, temporal, and cross-continental comparisons using python library like pandas, plotly, itables etc.
-
+These datasets were cleaned, merged, and transformed to enable gender-based, temporal, and cross-continental comparisons using python library like pandas, plotyl express, itables etc.
 
 
 
